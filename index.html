@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>陕西省城市基础设施生命线安全监管子系统</title>
+<link rel="stylesheet" href="css/style.css?v=261113d">
+<script src="assets/echarts.min.js"></script>
+<script src="assets/shaanxi-geo.js"></script>
+<script src="assets/three.min.js"></script>
+</head>
+<body>
+<div id="app">
+<!-- ========== 顶部：标题居中 + 八大专题两侧分布 ========== -->
+<header id="app-header">
+  <div class="header-bg"></div>
+  <!-- 左侧四个专题 -->
+  <nav class="nav-cluster nav-left">
+    <a href="#/gas" class="nav-btn" data-key="gas">
+      <span class="nav-icon">🔥</span><span class="nav-label">管道燃气</span>
+    </a>
+    <a href="#/lpg" class="nav-btn" data-key="lpg">
+      <span class="nav-icon">⛽</span><span class="nav-label">瓶装液化气</span>
+    </a>
+    <a href="#/drainage" class="nav-btn" data-key="drainage">
+      <span class="nav-icon">�</span><span class="nav-label">城市排水</span>
+    </a>
+    <a href="#/bridge" class="nav-btn" data-key="bridge">
+      <span class="nav-icon">🌉</span><span class="nav-label">桥梁安全</span>
+    </a>
+  </nav>
+  <!-- 中间标题（点击返回综合监管首页） -->
+  <div class="header-center">
+    <div class="header-meta">
+      <span class="header-date" id="header-date"></span>
+      <span class="header-weather">晴 12℃</span>
+    </div>
+    <h1 class="header-title">
+      <a href="#/home" title="返回综合监管驾驶舱"><span class="title-glow">陕西省城市基础设施生命线安全监管子系统</span></a>
+    </h1>
+    <div class="header-meta header-meta-bottom">
+      <span class="header-status">系统运行正常</span>
+      <span class="header-update">数据更新 实时</span>
+      <span class="header-duty">值守：省住建厅</span>
+    </div>
+  </div>
+  <!-- 右侧四个专题 -->
+  <nav class="nav-cluster nav-right">
+    <a href="#/tunnel" class="nav-btn" data-key="tunnel">
+      <span class="nav-icon">🕳️</span><span class="nav-label">隧道安全</span>
+    </a>
+    <a href="#/water" class="nav-btn" data-key="water">
+      <span class="nav-icon">🚰</span><span class="nav-label">城市供水</span>
+    </a>
+    <a href="#/heating" class="nav-btn" data-key="heating">
+      <span class="nav-icon">♨️</span><span class="nav-label">城市供热</span>
+    </a>
+    <a href="#/corridor" class="nav-btn" data-key="corridor">
+      <span class="nav-icon">🧱</span><span class="nav-label">综合管廊</span>
+    </a>
+  </nav>
+</header>
+
+<!-- ========== 页面容器 ========== -->
+<main id="page-container">
+  <!-- 首页 -->
+  <section id="page-home" class="page active">
+    <div class="page-layout home-layout">
+      <!-- 左侧面板 -->
+      <div class="col col-left">
+        <div class="panel">
+          <div class="panel-title"><i class="icon-bar-chart"></i> 生命线运行核心指标</div>
+          <div class="metrics-grid" id="home-core-metrics"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i>▦</i> 八大专题运行状态</div>
+          <div class="topic-status-list" id="home-topic-status"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i class="icon-alert"></i> 今日各地实时动态</div>
+          <div class="alert-list" id="home-alert-list"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i class="icon-list"></i> 预警类型 TOP5</div>
+          <div id="home-alert-type-chart" class="chart-box"></div>
+        </div>
+      </div>
+      <!-- 中间：数字带 + 地图 + 趋势 -->
+      <div class="col col-center">
+        <div class="home-kpi-strip" id="home-kpi-strip"></div>
+        <div class="home-map-wrap">
+          <div class="map-toolbar">
+            <button class="map-btn active" data-layer="vector">矢量地图</button>
+            <button class="map-btn" data-layer="satellite">遥感影像</button>
+            <button class="map-btn" data-layer="risk">风险叠加</button>
+          </div>
+          <div id="shaannxi-map" class="map-box"></div>
+          <div class="map-legend" id="map-legend"></div>
+        </div>
+      </div>
+      <!-- 右侧面板 -->
+      <div class="col col-right">
+        <div class="panel">
+          <div class="panel-title"><i class="icon-devices"></i> 设备接入排行</div>
+          <div id="home-device-rank" class="chart-box"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i>🧮</i> 八大专题今日预警分级</div>
+          <div id="home-topic-alert-chart" class="chart-box"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i class="icon-warning"></i> 各地市风险分布</div>
+          <div id="home-risk-chart" class="chart-box"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title"><i class="icon-weather"></i> 今日极端天气预警</div>
+          <div class="weather-list" id="home-weather-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 专题页公共结构占位 ===== -->
+  <section id="page-scenario" class="page">
+    <div class="page-layout scenario-layout" id="scenario-layout">
+      <div class="col col-left" id="scenario-left"></div>
+      <div class="col col-center" id="scenario-center">
+        <div class="map-toolbar">
+          <button class="map-btn active" data-layer="vector">矢量地图</button>
+          <button class="map-btn" data-layer="satellite">遥感影像</button>
+          <button class="map-btn" data-layer="risk">风险叠加</button>
+        </div>
+        <div id="scenario-map" class="map-box"></div>
+        <div class="map-legend" id="scenario-map-legend"></div>
+      </div>
+      <div class="col col-right" id="scenario-right"></div>
+    </div>
+    <!-- 全宽底部特色条带（按专题差异化渲染） -->
+    <div class="scenario-bottom" id="scenario-bottom" style="display:none"></div>
+  </section>
+
+  <!-- ===== 专题二级页面（点击专题卡片/模块进入） ===== -->
+  <section id="page-sub" class="page">
+    <div class="sub-layout">
+      <aside class="sub-side" id="sub-side"></aside>
+      <div class="sub-main" id="sub-main"></div>
+    </div>
+  </section>
+
+  <!-- ===== 燃气专题（整合燃气监管 demo，整页 iframe） ===== -->
+  <section id="page-gasframe" class="page">
+    <iframe id="gas-iframe" data-src="gas-demo/index.html" title="管道燃气安全监测专题"></iframe>
+    <button class="gas-back-btn" onclick="location.hash='#/home'">◀ 返回省级总览</button>
+  </section>
+
+  <!-- ===== 隧道/供水/供热/综合管廊（保留本系统标题栏，嵌入各自业务内容） ===== -->
+  <section id="page-ttframe" class="page">
+    <iframe id="tt-iframe" title="专题安全监管"></iframe>
+  </section>
+
+  <!-- ===== 桥梁CIM详情页 ===== -->
+  <section id="page-bridge-detail" class="page">
+    <div class="bridge-detail-wrap">
+      <div class="breadcrumb">
+        <a href="#/bridge">← 返回桥梁安全监管</a>
+        <span class="sep">›</span>
+        <span id="bridge-detail-name">桥梁详情</span>
+      </div>
+      <div class="bridge-detail-layout">
+        <div class="bridge-cim-view" id="bridge-cim-canvas"></div>
+        <div class="bridge-cim-panels" id="bridge-cim-panels"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ========== 底部状态栏 ========== -->
+<footer id="app-footer">
+  <span>陕西省住房和城乡建设厅 · 城市基础设施生命线安全监管平台 v2.0</span>
+  <span class="footer-right">© 2026 Shaanxi Lifeline Safety Supervision</span>
+</footer>
+</div>
+
+<script src="js/data.js?v=261113d"></script>
+<script src="js/map.js?v=261113d"></script>
+<script src="js/scenarios.js?v=261113d"></script>
+<script src="js/subpages.js?v=261113d"></script>
+<script src="js/app.js?v=261113f"></script>
+</body>
+</html>
